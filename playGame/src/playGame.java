@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class playGame {
 
-    public static void main(String[] var0) {
+    public static void main(String[] args) {
         Process     game;
         PrintWriter	sortInput;
         Scanner		sortError;
@@ -13,14 +13,9 @@ public class playGame {
         int lowestRange = 0;
         int guessedNumber = 50;
         String printOutput = "";
+        String[] printOutputSplit;
 
         try {
-//            Process game = (new ProcessBuilder(new String[]{"java",
-//                    "-cp", "C:\\Users\\baldd\\OneDrive\\Documents" +
-//                    "\\Personal\\David\\Java\\game\\playGame\\out" +
-//                    "\\production\\playGame", "game"})).start();
-
-            // This one works when they are in the same folder
             game = (new ProcessBuilder(new String[]{"java",
                     "-cp", System.getProperty("user.dir"), "game"})).start();
 
@@ -33,19 +28,20 @@ public class playGame {
             while(sortOutput.hasNextLine()) {
                 printOutput = sortOutput.nextLine();
 
-                String newline = System.getProperty("line.separator");
-                boolean hasNewline = printOutput.contains(newline);
-                if (hasNewline) {
-                    System.out.println("newline");
-                }
-
-                System.out.println(printOutput);
                 if (printOutput.contains("low")) {
                     lowestRange = guessedNumber + 1;
                 } else if (printOutput.contains("high")) {
                     highestRange = guessedNumber - 1;
+                }else if (printOutput.contains("Yay")) {
+                    printOutputSplit = printOutput.split(": ");
+                    printOutput = printOutputSplit[0] + ": " + guessedNumber +
+                                  "\n" + printOutputSplit[1];
                 }
 
+                System.out.println(printOutput);
+                // Calculate the number to guess by adding the high and low range together and then
+                // dividing by 2. This should help limit the number of guesses by splitting the
+                // difference before each guess.
                 guessedNumber = (int)Math.ceil((double)((float)(highestRange + lowestRange) / 2.0F));
                 sortInput.println(guessedNumber);
             }
@@ -63,10 +59,10 @@ public class playGame {
             sortError.close();
             int exitCode = game.waitFor();
             System.out.println("\nExited with error code : " + exitCode);
-        } catch (IOException var10) {
-            var10.printStackTrace();
-        } catch (InterruptedException var11) {
-            var11.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        } catch (InterruptedException interuptException) {
+            interuptException.printStackTrace();
         }
 
     }
