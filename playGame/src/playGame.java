@@ -5,19 +5,24 @@ import java.util.Scanner;
 public class playGame {
 
     public static void main(String[] var0) {
+        Process     game;
         PrintWriter	sortInput;
         Scanner		sortError;
         Scanner		sortOutput;
         int highestRange = 100;
         int lowestRange = 0;
         int guessedNumber = 50;
-        String output = "";
+        String printOutput = "";
 
         try {
-            Process game = (new ProcessBuilder(new String[]{"java",
-                    "-cp", "C:\\Users\\baldd\\OneDrive\\Documents" +
-                    "\\Personal\\David\\Java\\game\\playGame\\out" +
-                    "\\production\\playGame", "game"})).start();
+//            Process game = (new ProcessBuilder(new String[]{"java",
+//                    "-cp", "C:\\Users\\baldd\\OneDrive\\Documents" +
+//                    "\\Personal\\David\\Java\\game\\playGame\\out" +
+//                    "\\production\\playGame", "game"})).start();
+
+            // This one works when they are in the same folder
+            game = (new ProcessBuilder(new String[]{"java",
+                    "-cp", System.getProperty("user.dir"), "game"})).start();
 
             sortInput = new PrintWriter(game.getOutputStream(), true);
             sortError = new Scanner(game.getErrorStream());
@@ -26,11 +31,18 @@ public class playGame {
             sortInput.println(guessedNumber);
 
             while(sortOutput.hasNextLine()) {
-                output = sortOutput.nextLine();
-                System.out.println(output);
-                if (output.contains("low")) {
+                printOutput = sortOutput.nextLine();
+
+                String newline = System.getProperty("line.separator");
+                boolean hasNewline = printOutput.contains(newline);
+                if (hasNewline) {
+                    System.out.println("newline");
+                }
+
+                System.out.println(printOutput);
+                if (printOutput.contains("low")) {
                     lowestRange = guessedNumber + 1;
-                } else if (output.contains("high")) {
+                } else if (printOutput.contains("high")) {
                     highestRange = guessedNumber - 1;
                 }
 
@@ -39,7 +51,7 @@ public class playGame {
             }
 
             if (sortError.hasNextLine()) {
-                System.out.println("-=-=- sort stderr -=-=-");
+                System.out.println("<--- Game Error --->");
 
                 while(sortError.hasNextLine()) {
                     System.out.println(sortError.nextLine());
@@ -49,8 +61,8 @@ public class playGame {
             sortOutput.close();
             sortInput.close();
             sortError.close();
-            int var9 = game.waitFor();
-            System.out.println("\nExited with error code : " + var9);
+            int exitCode = game.waitFor();
+            System.out.println("\nExited with error code : " + exitCode);
         } catch (IOException var10) {
             var10.printStackTrace();
         } catch (InterruptedException var11) {
